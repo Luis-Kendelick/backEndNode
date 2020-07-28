@@ -8,11 +8,16 @@ app.use(express.json());
 const projects = [];
 
 app.get('/projects', (request, response)=>{
-    const {title, owner} = request.query;
 
-    console.log(title)
-    return response.json(projects);
+    const {title} = request.query;
+
+    const results = title
+        ? projects.filter(project => project.title.includes(title))
+        : projects;
+
+    return response.json(results);
 });
+
 app.post('/projects', (request, response)=>{
     const { title, owner} = request.body;
 
@@ -22,20 +27,44 @@ app.post('/projects', (request, response)=>{
 
     return response.json(project);
 });
+
 app.put('/projects/:id', (request, response)=>{
     
-    const body = request.body;
-    // const id = request.params;
+    const {title, owner} = request.body;
     const {id} = request.params;
-    const project = projects.find(project => projects.id === param.id);
-    console.log(id);
+
+    const projectIndex = projects.findIndex(project => project.id === id);
+
+    if (projectIndex < 0){
+        return response.json({error: "Project not found! Try again."}, 404);
+    }
+
+    const project = {
+        id, 
+        title, 
+        owner
+    };
+
+    projects[projectIndex] = project;
     // console.log(project)
 
-    return response.json({ message: "Hello GOstackPut" });
+    return response.json(project);
 });
+
 app.delete('/projects/:id', (request, response)=>{
-    return response.json({ message: "Hello GOstackdel" });
+    const { id } = request.params;
+
+
+    const projectIndex = projects.findIndex(project => project.id === id);
+
+    if (projectIndex < 0){
+        return response.json({error: "sua mãe é minha"}, 404);
+    }
+
+    projects.splice(projectIndex, 1);
+    return response.status(204).send();
 });
+
 app.listen(3333, ()=>{
-    console.log('sua vó')
+    console.log('🔋')
 });
